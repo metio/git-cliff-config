@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: The git-cliff-config Authors
+# SPDX-License-Identifier: 0BSD
+
+# Org-wide git-cliff configuration for the metio projects. Each repo's release
+# workflow loads this via `git-cliff --config-url` (pinned to a commit and bumped
+# by Renovate), so the commit-grouping convention lives in exactly one place.
+#
+# It serves two repo shapes:
+#   - single-project repos (jaas, stageset-controller): bare calendar tags
+#     (YYYY.M.D); the release passes `--tag <version>`.
+#   - the helm-charts monorepo: per-chart, with CHART/VERSION env set and the
+#     release passing `--include-path charts/<name>/**` and
+#     `--tag-pattern ^<name>-` (which overrides the tag_pattern below).
+#
+# Breaking changes follow the Conventional Commits convention: a `!` after the
+# type/scope (feat(api)!: …) or a `BREAKING CHANGE:` footer. They render in a
+# dedicated section AND under their type group; the operator how-to lives in each
+# project's MIGRATIONS.md.
+
+[changelog]
+header = ""
+# Heading: "<CHART> <VERSION>" for the monorepo (CHART env set), otherwise the
+# tag (set via --tag) for single-project repos, otherwise "Unreleased".
+body = """
+{% if version %}## {% if get_env(name="CHART", default="") != "" %}{{ get_env(name="CHART") }} {{ get_env(name="VERSION", default=version) }}{% else %}{{ version }}{% endif %}{% else %}## Unreleased{% endif %}
+{% if commits | filter(attribute="breaking", value=true) | length > 0 %}
+### ⚠ Breaking changes
+{% for commit in commits | filter(attribute="breaking", value=true) %}
+- {{ commit.breaking_description | default(value=commit.message) | split(pat="\n") | first | trim }}
+{% endfor %}{% endif %}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | upper_first }}
+{% for commit in commits %}
+- {{ commit.message | split(pat="\n") | first | trim }}{% if commit.remote.pr_number %} (#{{ commit.remote.pr_number }}){% endif %}
+{% endfor %}
+{% endfor %}
+"""
+trim = true
+footer = ""
+
+[git]
+conventional_commits = true
+filter_unconventional = false
+split_commits = false
+commit_parsers = [
+    { message = "^feat", group = "Added" },
+    { message = "^fix", group = "Fixed" },
+    { message = "^doc", group = "Documentation" },
+    { message = "^perf", group = "Performance" },
+    { message = "^refactor", group = "Changed" },
+    { message = "^chore\\(deps\\)", group = "Dependencies" },
+    { message = "^chore", group = "Changed" },
+    { message = "^revert", group = "Reverted" },
+    { message = ".*", group = "Changed" },
+]
+protect_breaking_commits = true
+filter_commits = false
+# Single-project repos tag bare calendar versions (YYYY.M.D). The helm-charts
+# monorepo overrides this per chart with `--tag-pattern ^<name>-`.
+tag_pattern = "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+topo_order = false
+sort_commits = "newest"
