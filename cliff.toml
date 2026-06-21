@@ -27,12 +27,12 @@ body = """
 ### ⚠ Breaking changes
 {% for commit in commits | filter(attribute="breaking", value=true) %}
 - {{ commit.breaking_description | default(value=commit.message) | split(pat="\n") | first | trim }}
-{% endfor %}{% endif %}
+{%- endfor %}{% endif %}
 {% for group, commits in commits | group_by(attribute="group") %}
 ### {{ group | upper_first }}
 {% for commit in commits %}
 - {{ commit.message | split(pat="\n") | first | trim }}{% if commit.remote.pr_number %} (#{{ commit.remote.pr_number }}){% endif %}
-{% endfor %}
+{%- endfor %}
 {% endfor %}
 """
 trim = true
