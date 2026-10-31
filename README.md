@@ -59,3 +59,7 @@ Documentation, `perf` → Performance, `refactor`/`chore` → Changed,
 `BREAKING CHANGE:` footer. They render in a dedicated **⚠ Breaking changes**
 section; the operator-facing upgrade steps belong in each project's
 `MIGRATIONS.md`.
+
+## License
+
+[0BSD](LICENSES/0BSD.txt).
