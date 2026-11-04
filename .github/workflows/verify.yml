@@ -11,7 +11,7 @@ permissions:
 jobs:
   lint:
     name: Lint
-    uses: metio/ci/.github/workflows/lint.yml@ae0e705ebcf7129d3f8e15699a6941b6a86e0742 # metio/ci#95
+    uses: metio/ci/.github/workflows/lint.yml@ae0e705ebcf7129d3f8e15699a6941b6a86e0742 # feat/lint-workflow
   verify:
     name: Verify
     needs: [lint]
