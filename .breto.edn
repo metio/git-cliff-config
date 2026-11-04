@@ -1,0 +1,4 @@
+;; SPDX-FileCopyrightText: The git-cliff-config Authors
+;; SPDX-License-Identifier: 0BSD
+
+{:packages ["@lint"]}
